@@ -20,10 +20,6 @@ jobs:
       run:
         working-directory: 01-ci-lab
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
 
       - name: Checkout repository
@@ -52,6 +48,7 @@ jobs:
 
     permissions:
       id-token: write
+      contents: read
 
     needs: test
 
