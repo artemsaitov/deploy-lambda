@@ -68,8 +68,30 @@ jobs:
           cp app/calculator.py lambda_function.py
           zip function.zip lambda_function.py
 
-      - name: Deploy Lambda
+       
+        
+      - name: Create or update Lambda
         run: |
-          aws lambda update-function-code \
-            --function-name calculator-app \
-            --zip-file fileb://function.zip
+          FUNCTION_NAME="calculator-app"
+          LAMBDA_EXECUTION_ROLE_ARN="arn:aws:iam::443245369180:role/lambda-execution-role"
+
+          if aws lambda get-function --function-name "$FUNCTION_NAME" >/dev/null 2>&1; then
+            echo "Lambda exists. Updating code..."
+
+            aws lambda update-function-code \
+              --function-name "$FUNCTION_NAME" \
+              --zip-file fileb://function.zip
+
+          else
+            echo "Lambda does not exist. Creating function..."
+
+            aws lambda create-function \
+              --function-name "$FUNCTION_NAME" \
+              --runtime python3.11 \
+              --role "$LAMBDA_EXECUTION_ROLE_ARN" \
+              --handler lambda_function.lambda_handler \
+              --zip-file fileb://function.zip
+
+          fi
+
+
